@@ -67,12 +67,26 @@ class UserController {
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir);
             }
-            const fileName = `${userId}.png`;
+            const randomChars = Array.from({ length: 7 }, () => 
+                String.fromCharCode(Math.floor(Math.random() * 26) + 97)
+                ).join('');
+
+            const fileName = `${userId}_${randomChars}.png`;
             const filePath = path.join(uploadDir, fileName);
             await photo.mv(filePath);
             const imageUrl = `${process.env.API_URL}/userFiles/${fileName}`;
             const updatedUser = await userService.uploadUserPhoto(userId, imageUrl);
             res.json(updatedUser);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async deleteUsersAvatar(req, res, next) {
+        try {
+            const userId = req.user.id;
+            const user = await userService.deleteUserPhoto(userId);
+            res.json(user);
         } catch (e) {
             next(e);
         }

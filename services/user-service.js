@@ -113,6 +113,20 @@ class UserService {
         return userDto;
     }
 
+    async deleteUserPhoto(id) {
+        const user = await AppDataSource.getRepository(User).findOneBy({id});
+
+        if (!user) {
+            throw ApiError.badRequest('User is not found');
+        }
+
+        user.profile_image = null;
+        const updatedUser = await AppDataSource.getRepository(User).save(user);
+        const userDto = new UserDto(updatedUser);
+
+        return userDto;
+    }
+
     async changePass(id, passwords) {
         const user = await AppDataSource.getRepository(User).findOneBy({id});
 

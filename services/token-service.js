@@ -54,7 +54,6 @@ class TokenService {
 
     async removeToken(refreshToken) {
         const tokenData = await AppDataSource.getRepository(Token).delete({refresh_token: refreshToken});
-        console.log(tokenData); //!ASDFASDFS
         return tokenData
     }
 
