@@ -12,12 +12,20 @@ const userRouter = require('./router/user-routs')
 const errorMiddleware = require('./middlewares/errorMiddleware');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 180,
+  message: 'Request limit exceeded. Please try again later.',
+});
 
 const corsOptions = {
     origin: process.env.CLIENT_URL,
     credentials: true,
   };
 
+app.use(limiter);
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 app.use(cors(corsOptions));
