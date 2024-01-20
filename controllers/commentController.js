@@ -4,6 +4,7 @@ const path = require('path');
 const {validationResult} = require('express-validator');
 const ApiError = require('../exceptions/apiError');
 const reactionService = require("../services/reaction-service");
+const postService = require("../services/post-service");
 
 class CommentController {
     async createComment(req, res, next) {
@@ -37,7 +38,7 @@ class CommentController {
     async deleteComment(req, res, next) {
         try {
             const id = req.params.id;
-            const authorId = req.user.id;                        //A!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            const authorId = req.user.id;  
 
             await commentService.checkAuthor(id, authorId);
             await commentService.deleteComment(id);
@@ -116,6 +117,34 @@ class CommentController {
 
             const reaction = await reactionService.checkCommentReaction(authorId, commentId);
             res.json(reaction);
+        } catch(e) {
+            next(e);
+        }
+    }
+
+    async markAsAnswer(req, res, next) {
+        try {
+            const commentId = req.params.id;
+            const authorId = req.user.id;
+            const { postId } = req.body;
+
+            await postService.checkAuthor(postId, authorId);
+            const comment = await commentService.markAsAnswer(commentId, authorId, postId);
+            res.json(comment);
+        } catch(e) {
+            next(e);
+        }
+    }
+
+    async unmarkAnswer(req, res, next) {
+        try {
+            const commentId = req.params.id;
+            const authorId = req.user.id;
+            const { postId } = req.body;
+
+            await postService.checkAuthor(postId, authorId);
+            const comment = await commentService.unmarkAnswer(commentId, authorId, postId);
+            res.json(comment);
         } catch(e) {
             next(e);
         }

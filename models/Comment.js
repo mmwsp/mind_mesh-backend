@@ -20,6 +20,10 @@ const Comment = new EntitySchema({
     content: {
       type: 'text',
     },
+    marked_as_answer: {
+      type: 'boolean',
+      default: false,
+    },
     status: {
       type: 'enum',
       enum: ['active', 'inactive'],

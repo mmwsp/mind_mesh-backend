@@ -98,6 +98,50 @@ class CommentService {
         }
     }
 
+    async markAsAnswer(commentId, authorId, postId) {
+        await this.checkAuthor(commentId, authorId);
+        await this.checkMarkedPostComment(postId);
+
+        const comment = await AppDataSource.getRepository(Comment).findOneBy({id: commentId});
+        comment.marked_as_answer = true;
+        await AppDataSource.getRepository(Comment).save(comment);
+
+        const author = await userService.getUser(comment.author_id);
+        return new CommentDto(comment, author.login, author.profileImage, postId);
+    }
+
+    async checkMarkedPostComment(postId) {
+        const postComments = await AppDataSource.getRepository(PostComment)
+          .createQueryBuilder("postcomment")
+          .where("postcomment.post_id = :postId", { postId: postId })
+          .select("postcomment.comment_id")
+          .getMany();
+      
+        const commentIds = postComments.map((postComment) => postComment.comment_id);
+        const comments = await AppDataSource.getRepository(Comment).findBy({ id: In(commentIds) });
+      
+        const hasMarkedAnswer = comments.some((comment) => comment.marked_as_answer);
+      
+        if (hasMarkedAnswer) {
+          throw ApiError.badRequest('You already have a marked answer. To mark the new one, you need to remove the old marking.');
+        }
+      }
+
+      async unmarkAnswer(commentId, authorId, postId) {
+        await this.checkAuthor(commentId, authorId);
+
+        const comment = await AppDataSource.getRepository(Comment).findOneBy({id: commentId});
+
+        if(comment.marked_as_answer) {
+            comment.marked_as_answer = false;
+            await AppDataSource.getRepository(Comment).save(comment);
+        } else {
+            throw ApiError.badRequest('You cannot unmark this comment, because it is not marked as an answer.');
+        }
+
+        const author = await userService.getUser(comment.author_id);
+        return new CommentDto(comment, author.login, author.profileImage, postId);
+    }
 
 }
 
