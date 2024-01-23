@@ -5,6 +5,7 @@ const {validationResult} = require('express-validator');
 const ApiError = require('../exceptions/apiError');
 const reactionService = require("../services/reaction-service");
 const postService = require("../services/post-service");
+const ratingService = require("../services/rating-service");
 
 class CommentController {
     async createComment(req, res, next) {
@@ -71,6 +72,7 @@ class CommentController {
             const { reactionType } = req.body;
             const authorId = req.user.id;
             const reaction = await reactionService.createReactionComment(authorId, reactionType, commentId);
+            await ratingService.rateCommentAuthor(reaction.type, commentId);
             res.json(reaction);
         } catch(e) {
             next(e);
@@ -82,6 +84,7 @@ class CommentController {
             const commentId = req.params.id;
             const authorId = req.user.id;
             await reactionService.deleteCommentReaction(authorId, commentId);
+            await ratingService.unrateCommentAuthor(commentId);
             res.status(200).json({ message: 'Reaction is successfully removed' });
         } catch(e) {
             next(e);
@@ -129,7 +132,8 @@ class CommentController {
             const { postId } = req.body;
 
             await postService.checkAuthor(postId, authorId);
-            const comment = await commentService.markAsAnswer(commentId, authorId, postId);
+            const comment = await commentService.markAsAnswer(commentId, postId);
+            await ratingService.rateAnswerAuthor(commentId);
             res.json(comment);
         } catch(e) {
             next(e);
@@ -143,7 +147,8 @@ class CommentController {
             const { postId } = req.body;
 
             await postService.checkAuthor(postId, authorId);
-            const comment = await commentService.unmarkAnswer(commentId, authorId, postId);
+            const comment = await commentService.unmarkAnswer(commentId, postId);
+            await ratingService.unrateAnswerAuthor(commentId);
             res.json(comment);
         } catch(e) {
             next(e);

@@ -5,6 +5,7 @@ const {validationResult} = require('express-validator');
 const ApiError = require('../exceptions/apiError');
 const cheerio = require('cheerio');
 const reactionService = require("../services/reaction-service");
+const ratingService = require("../services/rating-service");
 const imageDirectory = 'userFiles';
 
 class PostController {
@@ -163,6 +164,7 @@ class PostController {
             const { reactionType } = req.body;
             const authorId = req.user.id;
             const reaction = await reactionService.createReactionPost(authorId, reactionType, postId);
+            await ratingService.ratePostAuthor(reaction.type, postId);
             res.json(reaction);
         } catch(e) {
             next(e);
@@ -174,6 +176,7 @@ class PostController {
             const postId = req.params.id;
             const authorId = req.user.id;
             await reactionService.deletePostReaction(authorId, postId);
+            await ratingService.unratePostAuthor(postId);
             res.status(200).json({ message: 'Reaction is successfully removed' });
         } catch(e) {
             next(e);

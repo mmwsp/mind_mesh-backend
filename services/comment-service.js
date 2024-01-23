@@ -98,8 +98,18 @@ class CommentService {
         }
     }
 
-    async markAsAnswer(commentId, authorId, postId) {
-        await this.checkAuthor(commentId, authorId);
+    async findAuthor(commentId) {
+        const comment = await AppDataSource.getRepository(Comment).findOneBy({id: commentId});
+    
+        if (!comment) {
+            throw ApiError.badRequest('Comment is not found');
+        }
+    
+        const author = await userService.getUser(comment.author_id);
+        return author;
+      }
+
+    async markAsAnswer(commentId, postId) {
         await this.checkMarkedPostComment(postId);
 
         const comment = await AppDataSource.getRepository(Comment).findOneBy({id: commentId});
@@ -127,9 +137,7 @@ class CommentService {
         }
       }
 
-      async unmarkAnswer(commentId, authorId, postId) {
-        await this.checkAuthor(commentId, authorId);
-
+      async unmarkAnswer(commentId, postId) {
         const comment = await AppDataSource.getRepository(Comment).findOneBy({id: commentId});
 
         if(comment.marked_as_answer) {

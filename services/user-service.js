@@ -60,9 +60,6 @@ class UserService {
         if (updatedFields.login) {
             user.login = updatedFields.login;
         }
-        if (updatedFields.rating) {
-            user.rating = user.rating + updatedFields.rating;
-        }
         const updatedUser = await AppDataSource.getRepository(User).save(user);
         const userDto = new UserDto(updatedUser);
         return userDto;
@@ -147,6 +144,22 @@ class UserService {
         user.password = hashNewPassword;
         await AppDataSource.getRepository(User).save(user);
 
+    }
+
+    async updateUserRating(userId, points) {
+        const user = await AppDataSource.getRepository(User).findOneBy({id: userId});
+
+        if(!user) {
+            throw ApiError.badRequest(`User is not exist.`);
+        }
+
+        if (points < 0 && user.rating + points < 0) {
+            user.rating = 0;
+        } else {
+            user.rating += points;
+        }
+        
+        await AppDataSource.getRepository(User).save(user);
     }
 }
 

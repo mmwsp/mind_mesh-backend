@@ -180,6 +180,17 @@ class PostService {
         }
     }
 
+    async findAuthor(postId) {
+        const post = await AppDataSource.getRepository(Post).findOneBy({id: postId});
+    
+        if (!post) {
+            throw ApiError.badRequest('Post is not found');
+        }
+    
+        const author = await userService.getUser(post.author_id);
+        return author;
+      }
+
 
     async updatePost(id, updatedFields) {
         const post = await AppDataSource.getRepository(Post).findOneBy({id});
