@@ -116,7 +116,6 @@ class UserController {
         try {
             const userId = req.user.id;
             const passwords = req.body;
-            console.log(passwords);
             await userService.changePass(userId, passwords);
             res.status(200).json({ message: 'Password is changed' });
         } catch(e) {

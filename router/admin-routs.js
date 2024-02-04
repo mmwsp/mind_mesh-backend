@@ -7,7 +7,7 @@ const postController = require('../controllers/postController');
 const commentController = require('../controllers/commentController');
 const router = new Router();
 
-router.post('/user/create', 
+router.post('/user', 
     authMiddleware,
     adminMiddleware,
     body('email').isEmail(),
@@ -16,6 +16,6 @@ router.post('/user/create',
 
 router.patch('/post/:id', authMiddleware, adminMiddleware, postController.updatePostByAdmin);
 router.patch('/comment/:id', authMiddleware, adminMiddleware, commentController.setCommentStatus);
-router.get('/post', authMiddleware, adminMiddleware, postController.getAllPosts);
+router.get('/posts', authMiddleware, adminMiddleware, postController.getAllPosts);
 
 module.exports = router;

@@ -14,7 +14,6 @@ router.post('/unmark/:id', authMiddleware, commentController.unmarkAnswer);
 router.get('/post/:id', commentController.getPostComments);
 router.get('/:id/reaction', commentController.getCommentReactions);
 router.get('/check-reaction/:id', authMiddleware, commentController.checkReaction)
-router.get('/:id/reaction', commentController.getCommentReactions);
 
 router.patch('/:id', authMiddleware, commentController.updateComment);
 router.delete('/:id', authMiddleware, commentController.deleteComment);

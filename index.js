@@ -9,6 +9,7 @@ const postRouter = require('./router/post-routs');
 const commentRouter = require('./router/comment-routs');
 const categoriesRouter = require('./router/categories-routs');
 const userRouter = require('./router/user-routs')
+const adminRouter = require('./router/admin-routs');
 const errorMiddleware = require('./middlewares/errorMiddleware');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
@@ -34,6 +35,7 @@ app.use(express.json());
 app.use(fileUpload());
 app.use(cookieParser());
 app.use('/api/auth', authRouter);
+app.use('/api/admin', adminRouter);
 app.use('/api/users', userRouter);
 app.use('/api/posts', postRouter);
 app.use('/api/comments', commentRouter);
